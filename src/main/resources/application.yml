@@ -1,0 +1,20 @@
+# ============================================
+# 第01步：Spring Boot 项目搭建 —— 配置文件
+# 按课件 7.2 节填写 application.yml
+# 注意：yml 靠缩进表示层级，空格必须对齐
+# ============================================
+server:
+  port: 8080
+  servlet:
+    # 所有接口统一加 /api 前缀
+    context-path: /api
+
+spring:
+  application:
+    name: recruitment-website
+  jackson:
+    serialization:
+      write-dates-as-timestamps: false
+    # 以后 JSON 里的时间按东八区、yyyy-MM-dd HH:mm:ss 输出
+    date-format: yyyy-MM-dd HH:mm:ss
+    time-zone: Asia/Shanghai
