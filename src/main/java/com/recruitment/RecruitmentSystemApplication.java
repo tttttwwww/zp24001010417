@@ -23,7 +23,7 @@ public class RecruitmentSystemApplication {
                 ====================================
                    招聘网站后端启动成功！
                    Spring Boot 版本: 3.2.2
-                   Java 版本: 17
+                   Java 版本: 17 
                 ====================================
                 """);
     }
