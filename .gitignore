@@ -14,3 +14,7 @@ target/
 # 绯荤粺鏂囦欢
 .DS_Store
 Thumbs.db
+
+# 本地运行日志
+app.log
+app.err.log

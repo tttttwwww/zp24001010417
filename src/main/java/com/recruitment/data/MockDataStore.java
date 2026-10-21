@@ -66,7 +66,7 @@ public final class MockDataStore {
             return null;
         }
         for (User user : USERS.values()) {
-            if (username.equals(user.getUsername())) {
+            if (username.equals(user.getUserName())) {
                 return user;
             }
         }
@@ -80,12 +80,12 @@ public final class MockDataStore {
     private static void seedUsers() {
         User demo = new User();
         demo.setId(nextUserId());
-        demo.setUsername("demo");
-        demo.setPassword("123456");
-        demo.setNickname("示例用户");
+        demo.setUserName("demo");
+        demo.setPassWord("123456");
+        demo.setNickName("示例用户");
         demo.setEmail("demo@example.com");
         demo.setPhone("13800000000");
-        demo.setCreatetime(LocalDateTime.now());
+        demo.setCreateTime(LocalDateTime.now());
         saveUser(demo);
     }
 

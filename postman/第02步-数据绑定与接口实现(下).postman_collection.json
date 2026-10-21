@@ -1,0 +1,381 @@
+{
+  "info": {
+    "_postman_id": "recruitment-step02-collection",
+    "name": "第02步-数据绑定与接口实现",
+    "description": "招聘网站第02步课堂接口集合。先启动 RecruitmentApplication，再 Import 本文件。\n\n变量 baseUrl 默认 http://localhost:8080/api\n\n建议按文件夹顺序测：职位 → 用户 → 简历 → 收藏 → 投递。",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:8080/api"
+    }
+  ],
+  "item": [
+    {
+      "name": "5.1 职位",
+      "description": "浏览器也能测；Postman 可对照预期条数。",
+      "item": [
+        {
+          "name": "职位列表-全部（预期 3 条）",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/jobs/list",
+            "description": "无参数应返回 3 条预置职位。"
+          },
+          "response": []
+        },
+        {
+          "name": "职位列表-按城市杭州（预期 1 条）",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/jobs/list?city=杭州",
+              "host": ["{{baseUrl}}"],
+              "path": ["jobs", "list"],
+              "query": [{"key": "city", "value": "杭州"}]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "职位列表-关键词 Java（预期 1 条）",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/jobs/list?keyword=Java",
+              "host": ["{{baseUrl}}"],
+              "path": ["jobs", "list"],
+              "query": [{"key": "keyword", "value": "Java"}]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "职位详情-id=1（viewCount 每次 +1）",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/jobs/1"
+          },
+          "response": []
+        },
+        {
+          "name": "职位详情-id=99（预期 职位不存在）",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/jobs/99"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "5.2 用户",
+      "item": [
+        {
+          "name": "注册 user1",
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"userName\": \"user1\",\n  \"passWord\": \"123456\",\n  \"nickName\": \"用户1\",\n  \"email\": \"user1@example.com\",\n  \"phone\": \"13800000001\"\n}",
+              "options": {"raw": {"language": "json"}}
+            },
+            "url": "{{baseUrl}}/users/register",
+            "description": "成功：code=200，data.id 有值，data.passWord 为空。"
+          },
+          "response": []
+        },
+        {
+          "name": "注册重复用户名（预期 用户名已存在）",
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"userName\": \"user1\",\n  \"passWord\": \"123456\",\n  \"nickName\": \"用户1\"\n}",
+              "options": {"raw": {"language": "json"}}
+            },
+            "url": "{{baseUrl}}/users/register"
+          },
+          "response": []
+        },
+        {
+          "name": "登录 demo 预置账号",
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"userName\": \"demo\",\n  \"passWord\": \"123456\"\n}",
+              "options": {"raw": {"language": "json"}}
+            },
+            "url": "{{baseUrl}}/users/login"
+          },
+          "response": []
+        },
+        {
+          "name": "登录错误密码（预期失败）",
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"userName\": \"demo\",\n  \"passWord\": \"000000\"\n}",
+              "options": {"raw": {"language": "json"}}
+            },
+            "url": "{{baseUrl}}/users/login"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "5.3 简历（按顺序）",
+      "description": "① 创建 → ② 详情 id=1 → ③ 修改 → ④ 列表 → ⑤ 删除 → ⑥ 删后再查（首次创建后 id 一般为 1）",
+      "item": [
+        {
+          "name": "① 创建简历",
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"userId\": 1,\n  \"realName\": \"张三\",\n  \"gender\": 1,\n  \"phone\": \"13800138001\",\n  \"email\": \"zhangsan@example.com\",\n  \"city\": \"杭州\",\n  \"education\": \"本科\",\n  \"experience\": \"3年\",\n  \"expectedSalary\": \"15K-25K\",\n  \"skills\": \"Java,Spring Boot,MySQL\",\n  \"introduction\": \"热爱编程，有良好的团队协作能力\"\n}",
+              "options": {"raw": {"language": "json"}}
+            },
+            "url": "{{baseUrl}}/resumes"
+          },
+          "response": []
+        },
+        {
+          "name": "② 简历详情",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/resumes/1"
+          },
+          "response": []
+        },
+        {
+          "name": "③ 部分更新简历",
+          "request": {
+            "method": "PUT",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"realName\": \"张三（已更新）\",\n  \"phone\": \"13900139001\",\n  \"expectedSalary\": \"20K-30K\"\n}",
+              "options": {"raw": {"language": "json"}}
+            },
+            "url": "{{baseUrl}}/resumes/1"
+          },
+          "response": []
+        },
+        {
+          "name": "④ 用户简历列表 userId=1",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/resumes/list?userId=1",
+              "host": ["{{baseUrl}}"],
+              "path": ["resumes", "list"],
+              "query": [{"key": "userId", "value": "1"}]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "⑤ 删除简历",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": "{{baseUrl}}/resumes/1"
+          },
+          "response": []
+        },
+        {
+          "name": "删除后再查（预期 简历不存在）",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/resumes/1"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "5.4 收藏",
+      "item": [
+        {
+          "name": "添加收藏 userId=1 jobId=1",
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"userId\": 1,\n  \"jobId\": 1\n}",
+              "options": {"raw": {"language": "json"}}
+            },
+            "url": "{{baseUrl}}/favorites/add"
+          },
+          "response": []
+        },
+        {
+          "name": "重复收藏（预期 已收藏）",
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"userId\": 1,\n  \"jobId\": 1\n}",
+              "options": {"raw": {"language": "json"}}
+            },
+            "url": "{{baseUrl}}/favorites/add"
+          },
+          "response": []
+        },
+        {
+          "name": "收藏列表 userId=1",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/favorites/list?userId=1",
+              "host": ["{{baseUrl}}"],
+              "path": ["favorites", "list"],
+              "query": [{"key": "userId", "value": "1"}]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "取消收藏",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/favorites/remove?userId=1&jobId=1",
+              "host": ["{{baseUrl}}"],
+              "path": ["favorites", "remove"],
+              "query": [
+                {"key": "userId", "value": "1"},
+                {"key": "jobId", "value": "1"}
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "无效职位 jobId=99（预期 用户或职位不存在）",
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"userId\": 1,\n  \"jobId\": 99\n}",
+              "options": {"raw": {"language": "json"}}
+            },
+            "url": "{{baseUrl}}/favorites/add"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "5.5 投递",
+      "item": [
+        {
+          "name": "投递 userId=1 jobId=2",
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"userId\": 1,\n  \"jobId\": 2\n}",
+              "options": {"raw": {"language": "json"}}
+            },
+            "url": "{{baseUrl}}/applications/apply"
+          },
+          "response": []
+        },
+        {
+          "name": "重复投递（预期 已投递）",
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"userId\": 1,\n  \"jobId\": 2\n}",
+              "options": {"raw": {"language": "json"}}
+            },
+            "url": "{{baseUrl}}/applications/apply"
+          },
+          "response": []
+        },
+        {
+          "name": "投递列表 userId=1",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/applications/list?userId=1",
+              "host": ["{{baseUrl}}"],
+              "path": ["applications", "list"],
+              "query": [{"key": "userId", "value": "1"}]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "取消投递 PUT cancel",
+          "request": {
+            "method": "PUT",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/applications/cancel?userId=1&jobId=2",
+              "host": ["{{baseUrl}}"],
+              "path": ["applications", "cancel"],
+              "query": [
+                {"key": "userId", "value": "1"},
+                {"key": "jobId", "value": "2"}
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "取消后再投递（预期 重新投递成功）",
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"userId\": 1,\n  \"jobId\": 2\n}",
+              "options": {"raw": {"language": "json"}}
+            },
+            "url": "{{baseUrl}}/applications/apply"
+          },
+          "response": []
+        },
+        {
+          "name": "查职位2 applyCount（可选）",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/jobs/2",
+            "description": "投递成功后 applyCount 应至少为 1。"
+          },
+          "response": []
+        }
+      ]
+    }
+  ]
+}
