@@ -1,5 +1,8 @@
 package com.recruitment.model;
 
+import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
 
 import java.time.LocalDateTime;
@@ -8,10 +11,12 @@ import java.time.LocalDateTime;
  * 投递，userId + jobId + 状态
  */
 @Data
+@TableName("application")
 public class Application {
     public static final int STATUS_APPLIED = 0;    // 已投递
     public static final int STATUS_CANCELED = 1;   // 已取消
 
+    @TableId(type = IdType.AUTO)
     private Long id;                      // 投递ID
     private Long userId;                  // 用户ID
     private Long jobId;                   // 职位ID

@@ -1,6 +1,6 @@
 # ============================================
 # 第01步：Spring Boot 项目搭建 —— 配置文件
-# 按课件 7.2 节填写 application.yml
+# 第03步：接入 MySQL + MyBatis Plus
 # 注意：yml 靠缩进表示层级，空格必须对齐
 # ============================================
 server:
@@ -18,3 +18,21 @@ spring:
     # 以后 JSON 里的时间按东八区、yyyy-MM-dd HH:mm:ss 输出
     date-format: yyyy-MM-dd HH:mm:ss
     time-zone: Asia/Shanghai
+  # ---------- 第03步新增：数据源（本机开发账号） ----------
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/recruitment_db?useUnicode=true&characterEncoding=utf8&serverTimezone=Asia/Shanghai
+    username: root
+    password: 123456
+
+# ---------- 第03步新增：MyBatis Plus（与 spring 同级，顶格写） ----------
+mybatis-plus:
+  configuration:
+    # 表字段 company_name 自动对应 Java 的 companyName
+    map-underscore-to-camel-case: true
+    # 控制台打印执行的 SQL，方便对照
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+  global-config:
+    db-config:
+      # 主键自增，与建表语句的 AUTO_INCREMENT 一致
+      id-type: auto

@@ -18,3 +18,5 @@ Thumbs.db
 # 本地运行日志
 app.log
 app.err.log
+dbcheck.log
+dbcheck.err.log

@@ -1,5 +1,8 @@
 package com.recruitment.model;
 
+import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
 
 import java.time.LocalDateTime;
@@ -8,7 +11,9 @@ import java.time.LocalDateTime;
  * 简历，靠 userId 挂到用户
  */
 @Data
+@TableName("resume")
 public class Resume {
+    @TableId(type = IdType.AUTO)
     private Long id;                      // 简历ID
     private Long userId;                  // 所属用户ID
     private String realName;              // 真实姓名

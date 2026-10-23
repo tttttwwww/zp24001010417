@@ -1,14 +1,26 @@
 package com.recruitment.model;
 
+import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.annotation.TableName;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 /**
  * 职位（公司信息先写在同一个类里）
+ *
+ * @NoArgsConstructor：MyBatis Plus 查库后要靠无参构造反射创建对象，
+ * 而 @Builder 会吃掉默认构造器，所以必须显式补一个。
  */
 @Data
 @Builder
+@NoArgsConstructor
+@AllArgsConstructor
+@TableName("job")
 public class Job {
+    @TableId(type = IdType.AUTO)
     private Long id;                    // 职位ID
     private String companyName;         // 公司名称
     private String companyLogo;         // 公司Logo

@@ -39,7 +39,7 @@
         "Step":  "注册 user1",
         "Result":  "PASS",
         "Expect":  "code=200，id 有值，无 passWord",
-        "Actual":  "code=200, id=2, 含passWord=False"
+        "Actual":  "code=200, id=9, 含passWord=False"
     },
     {
         "Step":  "重复注册 user1",
@@ -63,7 +63,7 @@
         "Step":  "① 创建简历",
         "Result":  "PASS",
         "Expect":  "创建成功，自动补时间",
-        "Actual":  "id=1, createTime=2026-10-21 11:36:34"
+        "Actual":  "id=1, createTime=2026-10-23 10:23:06"
     },
     {
         "Step":  "② 简历详情",
