@@ -22,7 +22,7 @@ public class IndexController {
     public Result<Map<String, Object>> index() {
         Map<String, Object> info = new LinkedHashMap<>();
         info.put("application", "招聘网站后端");
-        info.put("step", "第02步：数据绑定与接口实现");
+        info.put("step", "第03步：MyBatis Plus 集成（MySQL 持久化）");
         info.put("baseUrl", "http://localhost:8080/api");
 
         List<Map<String, String>> apis = new ArrayList<>();
