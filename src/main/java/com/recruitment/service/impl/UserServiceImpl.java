@@ -5,6 +5,8 @@ import com.recruitment.common.Result;
 import com.recruitment.mapper.UserMapper;
 import com.recruitment.model.User;
 import com.recruitment.service.UserService;
+import com.recruitment.util.JwtUtil;
+import com.recruitment.vo.LoginVO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -18,6 +20,10 @@ public class UserServiceImpl implements UserService {
 
     @Autowired
     private UserMapper userMapper;
+
+    // 【第06步新增】登录成功后要生成 Token，所以注入 JwtUtil
+    @Autowired
+    private JwtUtil jwtUtil;
 
     @Override
     public Result<User> register(User request) {
@@ -54,7 +60,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public Result<User> login(User request) {
+    public Result<LoginVO> login(User request) {
         // 第 1 步：同样先校验参数不能为空
         if (request == null || isBlank(request.getUserName())) {
             return Result.error("用户名不能为空");
@@ -73,8 +79,11 @@ public class UserServiceImpl implements UserService {
             return Result.error("用户名或密码错误");
         }
 
-        // 第 4 步：登录成功，同样去掉密码再返回
-        return Result.success("登录成功", maskPassword(user));
+        // 第 4 步：用数据库中的用户 ID 生成 Token
+        String token = jwtUtil.generateToken(user.getId());
+
+        // 第 5 步：同时返回 Token 和已去掉密码的用户信息
+        return Result.success("登录成功", new LoginVO(token, maskPassword(user)));
     }
 
     @Override

@@ -1,6 +1,7 @@
 # ============================================
 # 第01步：Spring Boot 项目搭建 —— 配置文件
 # 第03步：接入 MySQL + MyBatis Plus
+# 第06步：JWT 认证（签名密钥 + 过期时间）
 # 注意：yml 靠缩进表示层级，空格必须对齐
 # ============================================
 server:
@@ -36,3 +37,10 @@ mybatis-plus:
     db-config:
       # 主键自增，与建表语句的 AUTO_INCREMENT 一致
       id-type: auto
+
+# ---------- 第06步新增：JWT ----------
+jwt:
+  # 签名密钥 32–47 字符，用于签名和验签；换一把密钥旧 Token 就无法通过验证
+  secret: recruitment-website-jwt-secret-key-2024-web-architecture-course
+  # 7 天，单位毫秒
+  expiration: 604800000

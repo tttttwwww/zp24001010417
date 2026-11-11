@@ -48,10 +48,10 @@
         "Actual":  "message=用户名已存在"
     },
     {
-        "Step":  "登录 demo/123456",
+        "Step":  "登录 demo/123456 返回 token + user",
         "Result":  "PASS",
-        "Expect":  "code=200，无 passWord",
-        "Actual":  "code=200, userName=demo, 含passWord=False"
+        "Expect":  "code=200，含 token，无 passWord",
+        "Actual":  "code=200, userName=demo, 含passWord=False, token长度=146"
     },
     {
         "Step":  "登录错误密码",
@@ -63,7 +63,7 @@
         "Step":  "① 创建简历",
         "Result":  "PASS",
         "Expect":  "创建成功，自动补时间",
-        "Actual":  "id=1, createTime=2026-10-28 11:05:01"
+        "Actual":  "id=1, createTime=2026-11-11 10:38:19"
     },
     {
         "Step":  "② 简历详情",
@@ -170,8 +170,8 @@
     {
         "Step":  "提交② 预置账号登录",
         "Result":  "PASS",
-        "Expect":  "code=200，无 passWord",
-        "Actual":  "code=200, userName=demo, 无passWord=True"
+        "Expect":  "code=200，含 token，无 passWord",
+        "Actual":  "code=200, userName=demo, 无passWord=True, 有token=True"
     },
     {
         "Step":  "提交③ 收藏字节职位 jobId=3",
@@ -184,5 +184,41 @@
         "Result":  "PASS",
         "Expect":  "含 companyName=字节跳动",
         "Actual":  "1 条，命中字节跳动 1 条"
+    },
+    {
+        "Step":  "① 不带 Token 访问 /users/info",
+        "Result":  "PASS",
+        "Expect":  "HTTP 401 + 请先登录",
+        "Actual":  "HTTP 401, code=401, message=请先登录"
+    },
+    {
+        "Step":  "② 伪造 Token 被拒绝",
+        "Result":  "PASS",
+        "Expect":  "HTTP 401",
+        "Actual":  "HTTP 401, message=Token无效或已过期"
+    },
+    {
+        "Step":  "③ 带 Token 访问 /users/info 返回当前用户",
+        "Result":  "PASS",
+        "Expect":  "demo 用户，无密码",
+        "Actual":  "code=200, id=1, userName=demo, 含passWord=False"
+    },
+    {
+        "Step":  "④ 白名单 /jobs/** 不带 Token 可用",
+        "Result":  "PASS",
+        "Expect":  "code=200，3 条",
+        "Actual":  "code=200, 3 条"
+    },
+    {
+        "Step":  "⑤ Swagger UI 可访问（白名单）",
+        "Result":  "PASS",
+        "Expect":  "HTTP 200",
+        "Actual":  "HTTP 200 "
+    },
+    {
+        "Step":  "⑥ OpenAPI 文档已配置 Bearer Token",
+        "Result":  "PASS",
+        "Expect":  "含 Bearer Token",
+        "Actual":  "schemes=Bearer Token"
     }
 ]

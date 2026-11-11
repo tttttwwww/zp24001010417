@@ -4,34 +4,44 @@
 
 - 第01步：Spring Boot 工程搭建
 - 第02步：数据绑定与接口实现（内存 MockDataStore）
-- **第03步：接入 MySQL，用 MyBatis Plus 持久化，删除 MockDataStore** ← 当前进度
+- 第03步：接入 MySQL，用 MyBatis Plus 持久化，删除 MockDataStore
+- **第06步：JWT 认证（登录发 Token，拦截器校验）** ← 当前进度
 
 - 端口：`8080`
 - 统一前缀：`/api`（`server.servlet.context-path`）
 - 统一响应：`{ "code": 200, "message": "操作成功", "data": ... }`，业务失败时 `code = 500`
+- 鉴权：受保护接口需 `Authorization: Bearer <token>`，未登录统一返回 HTTP 401
+- 接口文档：<http://localhost:8080/api/swagger-ui/index.html>（右上角 Authorize 贴 Token）
 
 ## 项目结构
 
 ```
 web-back/
-├── pom.xml                                   # 含 mybatis-plus-spring-boot3-starter、mysql-connector-j
+├── pom.xml                                   # mybatis-plus、mysql-connector-j、springdoc、jjwt
 ├── postman/                                  # 课件 Postman 集合副本
 ├── tools/
-│   ├── verify-api.ps1                        # 一键回归脚本（31 项断言，打真实接口）
+│   ├── verify-api.ps1                        # 一键回归脚本（37 项断言，打真实接口）
 │   └── verify-result.json                    # 最近一次执行的明细
+├── docs/第06步-截图/                          # 第06步 3 张提交截图
 └── src/main/
     ├── java/com/recruitment/
     │   ├── RecruitmentSystemApplication.java
     │   ├── common/Result.java                # 统一响应
     │   ├── config/
     │   │   ├── JacksonConfig.java            # LocalDateTime → yyyy-MM-dd HH:mm:ss
-    │   │   └── MyBatisPlusConfig.java        # 分页拦截器
+    │   │   ├── MyBatisPlusConfig.java        # 分页拦截器
+    │   │   ├── WebMvcConfig.java             # 【第06步】注册 JWT 拦截器 + 白名单
+    │   │   └── SwaggerConfig.java            # 【第06步】Bearer Token 安全方案
+    │   ├── context/UserContext.java          # 【第06步】ThreadLocal 保存当前 userId
     │   ├── controller/                       # Index / Hello / Job / User / Resume / Favorite / Application
+    │   ├── interceptor/JwtInterceptor.java   # 【第06步】验 Token、写 401、放行
     │   ├── mapper/                           # 5 个 Mapper，全部 extends BaseMapper<实体>
     │   ├── model/                            # 实体，@TableName + @TableId(AUTO)
-    │   └── service/ + service/impl/          # Service 注入 Mapper，不再有静态仓库
+    │   ├── service/ + service/impl/          # Service 注入 Mapper，不再有静态仓库
+    │   ├── util/JwtUtil.java                 # 【第06步】生成 / 验证 / 解析 Token
+    │   └── vo/LoginVO.java                   # 【第06步】token + user
     └── resources/
-        ├── application.yml                   # 数据源 + MyBatis Plus 配置
+        ├── application.yml                   # 数据源 + MyBatis Plus + jwt 配置
         └── db/init.sql                       # 建库、建表、演示数据
 ```
 
@@ -109,9 +119,10 @@ Controller（绑参）
 
 | 方法 | 路径 | 说明 |
 |---|---|---|
-| POST | `/users/register` | 注册；用户名重复返回「用户名已存在」；响应不含 `passWord` |
-| POST | `/users/login` | 登录；账号或密码错误统一返回「用户名或密码错误」 |
-| GET | `/users/{id}` | 用户信息（脱敏） |
+| POST | `/users/register` | 注册；用户名重复返回「用户名已存在」；响应不含 `passWord`（白名单） |
+| POST | `/users/login` | 登录；返回 `{ token, user }`，`user` 不含密码（白名单） |
+| GET | `/users/info` | **当前登录用户**，userId 由 Token 解析，不接收前端传参（需 Token） |
+| GET | `/users/{id}` | 用户信息（脱敏，需 Token） |
 
 ### 5.3 简历（CRUD）
 
@@ -153,10 +164,28 @@ Controller（绑参）
 powershell -ExecutionPolicy Bypass -File tools\verify-api.ps1
 ```
 
-31 项断言（26 个课件请求 + 根路径自检 + 4 项提交接口），结果写入 `tools/verify-result.json`。
+37 项断言（26 个课件请求 + 根路径自检 + 4 项提交接口 + 6 项第06步 JWT），结果写入 `tools/verify-result.json`。
+脚本会先登录拿 Token，再自动给受保护接口补 `Authorization: Bearer <token>`，白名单接口不带。
 脚本会改数据，重跑前建议先重跑 `init.sql` 还原。
 
-最近一次结果：**31/31 通过**，见 [第03步-接口验证报告.md](第03步-接口验证报告.md)。
+最近一次结果：**37/37 通过**，见 [第06步-接口验证报告.md](第06步-接口验证报告.md)。
+
+## JWT 认证
+
+请求链路：
+
+```
+登录 → 后端签发 Token → 前端保存 → 后续请求带 Authorization: Bearer <token>
+   → JwtInterceptor.preHandle 验签 → UserContext.setCurrentUserId(userId)
+   → Controller / Service 读 UserContext → afterCompletion 里 clear()
+```
+
+- 密钥与有效期在 `application.yml` 的 `jwt.secret` / `jwt.expiration`（默认 7 天）
+- Token 里只放 `userId`（`subject`）、签发时间、过期时间；**不放密码等敏感信息**
+- 未登录 / Token 无效返回 **HTTP 401**：`{"code":401,"message":"请先登录"}`
+- 白名单见 `WebMvcConfig`：`/users/login`、`/users/register`、`/jobs/**`、`/hello/**`、Swagger 路径等
+
+第06步的 3 张提交截图和复现步骤见 [第06步-提交清单.md](第06步-提交清单.md)。
 
 ## 常见问题
 
@@ -189,3 +218,12 @@ UPDATE job SET apply_count = 0, view_count = 0;
 
 **7. 取消后重新投递，`cancelTime` 为什么能清空？**
 `updateById` 默认忽略 null 字段。重新投递处用 `LambdaUpdateWrapper` 显式 `set(cancelTime, null)`，否则旧的取消时间会留在库里。
+
+**8. 访问 `/users/info` 返回 401「请先登录」？**
+这是第06步的正常行为。先 `POST /users/login` 拿 `data.token`，再在请求头加 `Authorization: Bearer <token>`；Swagger 里点右上角 **Authorize** 粘贴 token 即可。
+
+**9. 粘贴 Token 后仍提示「Token无效或已过期」？**
+有两种常见原因：一是自己手写了 `Bearer ` 前缀，Swagger 的 Value 框里只贴裸 Token；二是重启后改过 `jwt.secret`，旧 Token 的签名对不上了，重新登录即可。
+
+**10. Swagger 页面 404 / 打不开？**
+确认 `pom.xml` 里有 `springdoc-openapi-starter-webmvc-ui`，且 `WebMvcConfig` 白名单包含 `/swagger-ui/**`、`/v3/api-docs/**`；访问地址是 `/api/swagger-ui/index.html`（注意 context-path）。

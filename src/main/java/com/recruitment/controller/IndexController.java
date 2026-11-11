@@ -22,16 +22,18 @@ public class IndexController {
     public Result<Map<String, Object>> index() {
         Map<String, Object> info = new LinkedHashMap<>();
         info.put("application", "招聘网站后端");
-        info.put("step", "第03步：MyBatis Plus 集成（MySQL 持久化）");
+        info.put("step", "第06步：JWT 认证（登录发 Token + 拦截器校验）");
         info.put("baseUrl", "http://localhost:8080/api");
+        info.put("auth", "受保护接口需请求头 Authorization: Bearer <token>");
 
         List<Map<String, String>> apis = new ArrayList<>();
         apis.add(api("GET",    "/hello",                                  "欢迎语（自检用）"));
         apis.add(api("GET",    "/jobs/list?city=&keyword=",               "职位列表 / 双条件筛选"));
         apis.add(api("GET",    "/jobs/{id}",                              "职位详情，viewCount +1"));
-        apis.add(api("POST",   "/users/register",                         "注册，@RequestBody"));
-        apis.add(api("POST",   "/users/login",                            "登录，@RequestBody"));
-        apis.add(api("GET",    "/users/{id}",                             "用户信息"));
+        apis.add(api("POST",   "/users/register",                         "注册，@RequestBody（白名单）"));
+        apis.add(api("POST",   "/users/login",                            "登录，返回 token + user（白名单）"));
+        apis.add(api("GET",    "/users/info",                             "当前用户，需 Bearer Token"));
+        apis.add(api("GET",    "/users/{id}",                             "用户信息，需 Bearer Token"));
         apis.add(api("POST",   "/resumes",                                "新建简历"));
         apis.add(api("GET",    "/resumes/{id}",                           "简历详情"));
         apis.add(api("PUT",    "/resumes/{id}",                           "部分更新简历"));

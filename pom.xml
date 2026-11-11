@@ -29,6 +29,10 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <!-- 第03步新增：MyBatis Plus 版本（Spring Boot 3 必须用 spring-boot3-starter） -->
         <mybatis-plus.version>3.5.5</mybatis-plus.version>
+        <!-- 课件第06步 pom 快照中已有的前置版本号：SpringDoc 接口文档 -->
+        <springdoc.version>2.3.0</springdoc.version>
+        <!-- ↓ 第06步新增 -->
+        <jjwt.version>0.12.3</jjwt.version>
     </properties>
 
     <dependencies>
@@ -64,6 +68,32 @@
         <dependency>
             <groupId>com.mysql</groupId>
             <artifactId>mysql-connector-j</artifactId>
+            <scope>runtime</scope>
+        </dependency>
+
+        <!-- 课件第06步前置依赖：SpringDoc（Swagger UI / OpenAPI 文档） -->
+        <dependency>
+            <groupId>org.springdoc</groupId>
+            <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
+            <version>${springdoc.version}</version>
+        </dependency>
+
+        <!-- ↓ 第06步新增：JWT -->
+        <dependency>
+            <groupId>io.jsonwebtoken</groupId>
+            <artifactId>jjwt-api</artifactId>
+            <version>${jjwt.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.jsonwebtoken</groupId>
+            <artifactId>jjwt-impl</artifactId>
+            <version>${jjwt.version}</version>
+            <scope>runtime</scope>
+        </dependency>
+        <dependency>
+            <groupId>io.jsonwebtoken</groupId>
+            <artifactId>jjwt-jackson</artifactId>
+            <version>${jjwt.version}</version>
             <scope>runtime</scope>
         </dependency>
     </dependencies>
